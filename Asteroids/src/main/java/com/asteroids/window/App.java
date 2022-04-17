@@ -182,23 +182,23 @@ public class App extends Application {
                         Label highscoreCounter = new Label();
                         highscoreCounter.setFont(Font.font("Monoid", 35));
                         highscoreCounter.setPadding(new Insets(20, 0, 0, 0));
-
+                        
                         if (GLOBAL_POINTS_COUNTER > HIGHSCORE) {
                             HIGHSCORE = GLOBAL_POINTS_COUNTER;
                         }
-
+                        
                         highscoreCounter.setText("Highscore: " + HIGHSCORE);
 
                         hboxTop.getChildren().add(highscoreCounter);
                         hboxTop.setAlignment(Pos.CENTER);
                         hboxTop.setPadding(new Insets(20, 0, 0, 0));
 
-
+                        
                         vbox.getChildren().add(pointCounter);
                         vbox.getChildren().add(button);
                         vbox.setAlignment(Pos.CENTER);
                         vbox.setPadding(new Insets(0, 0, 20, 0));
-
+                        
 
                         button.setOnAction(e-> {
                             GLOBAL_POINTS_COUNTER = 0;
