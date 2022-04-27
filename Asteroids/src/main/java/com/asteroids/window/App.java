@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -51,24 +52,30 @@ public class App extends Application {
         pane.setPrefSize(WIDTH, HEIGHT);
         Text pointCounter = new Text(15, 30, "Points: 0");
         pointCounter.setFont(Font.font("Monoid", 15));
+
         Text projectileCounter = new Text(550, 30, "Laser Charges Left: " + CHARGES_COUNTER + "/5");
         projectileCounter.setFont(Font.font("Monoid", 15));
+
         pane.getChildren().add(pointCounter);
         pane.getChildren().add(projectileCounter);
-
-        BorderPane endScreenPane = new BorderPane();
+    
+        
         HBox hboxTop = new HBox();
-        HBox hboxCenter = new HBox();
         VBox vbox = new VBox();
 
         AtomicInteger points = new AtomicInteger();
 
         Ship ship = new Ship(WIDTH / 2, HEIGHT / 2);
+        ship.getCharacter().setFill(Color.BLUEVIOLET);
+
         List<Projectile> projectiles = new ArrayList<>();
         List<Asteroid> asteroids = new ArrayList<>();
+
         for (int i = 0; i < 5; i++) {
             Random rnd = new Random();
             Asteroid asteroid = new Asteroid(rnd.nextInt(WIDTH / 3), rnd.nextInt(HEIGHT));
+            asteroid.getCharacter().setFill(Color.DARKGREY);
+            asteroid.getCharacter().setStroke(Color.BLACK);
             asteroids.add(asteroid);
         }
 
@@ -76,16 +83,19 @@ public class App extends Application {
         asteroids.forEach(asteroid -> pane.getChildren().add(asteroid.getCharacter()));
 
         Scene scene = new Scene(pane);
+
         Map<KeyCode, Boolean> pressedKeys = new EnumMap<>(KeyCode.class);
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.SPACE && projectiles.size() < 5) {
-                projectileCounter.setText("Laser Charges Left: " + --CHARGES_COUNTER + "/5");
-                Projectile projectile = new Projectile((int) ship.getCharacter().getTranslateX(), (int) ship.getCharacter().getTranslateY());
-                projectile.getCharacter().setRotate(ship.getCharacter().getRotate());
                 pewPew.play();
+                projectileCounter.setText("Laser Charges Left: " + --CHARGES_COUNTER + "/5");
+                Projectile projectile = new Projectile(
+                    (int) ship.getCharacter().getTranslateX(), (int) ship.getCharacter().getTranslateY()
+                );
+                projectile.getCharacter().setFill(Color.RED);
+                projectile.getCharacter().setRotate(ship.getCharacter().getRotate());
                 projectiles.add(projectile);
-
                 projectile.accelerate();
                 projectile.setMovement(projectile.getMovement().normalize().multiply(3));
                 pane.getChildren().add(projectile.getCharacter());
@@ -106,6 +116,9 @@ public class App extends Application {
                 music.play();
                 if (Math.random() < 0.005) {
                     Asteroid asteroid = new Asteroid(WIDTH, HEIGHT);
+                    asteroid.getCharacter().setFill(Color.DARKGREY);
+                    asteroid.getCharacter().setStroke(Color.BLACK);
+
                     if (!asteroid.collide(ship)) {
                         asteroids.add(asteroid);
                         pane.getChildren().add(asteroid.getCharacter());
@@ -159,14 +172,15 @@ public class App extends Application {
                     if (ship.collide(asteroid)) {
                         stop();
                         pane.getChildren().clear();
+                        
                         music.stop();
                         deathSound.play();
 
                         Button button = new Button("Play Again");
                         button.setStyle(
                                 "-fx-background-radius: 8px;" +
-                                        "-fx-focus-color: transparent;" +
-                                        "-fx-faint-focus-color: transparent;"
+                                "-fx-focus-color: transparent;" +
+                                "-fx-faint-focus-color: transparent;"
 
                         );
 
@@ -179,6 +193,7 @@ public class App extends Application {
                         Label pointCounter = new Label("Points: " + GLOBAL_POINTS_COUNTER);
                         pointCounter.setFont(Font.font("Monoid", 25));
                         pointCounter.setPadding(new Insets(0, 0, 20, 0));
+
                         Label highscoreCounter = new Label();
                         highscoreCounter.setFont(Font.font("Monoid", 35));
                         highscoreCounter.setPadding(new Insets(20, 0, 0, 0));
@@ -200,10 +215,10 @@ public class App extends Application {
                         vbox.setPadding(new Insets(0, 0, 20, 0));
                         
 
-                        button.setOnAction(e-> {
+                        button.setOnAction(e -> {
                             GLOBAL_POINTS_COUNTER = 0;
                             CHARGES_COUNTER = 5;
-                            App app=new App();
+                            App app = new App();
                             app.start(stage);
                         });
                     }
