@@ -21,6 +21,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -128,6 +130,7 @@ public class App extends Application {
                 if (Boolean.TRUE.equals(pressedKeys.getOrDefault(KeyCode.LEFT, false))) {
                     ship.turnLeft();
                 }
+
                 if (Boolean.TRUE.equals(pressedKeys.getOrDefault(KeyCode.RIGHT, false))) {
                     ship.turnRight();
                 }
@@ -150,6 +153,7 @@ public class App extends Application {
                             GLOBAL_POINTS_COUNTER++;
                         }
                     });
+
                     if (!projectile.isAlive()) {
                         pointCounter.setText("Points: " + points.incrementAndGet());
                         projectileCounter.setText("Laser Charges Left: " + ++CHARGES_COUNTER + "/5");
@@ -203,6 +207,14 @@ public class App extends Application {
                         }
                         
                         highscoreCounter.setText("Highscore: " + HIGHSCORE);
+                        
+                        try (FileWriter write = new FileWriter("highscores")) {
+                            if (HIGHSCORE >= GLOBAL_POINTS_COUNTER) {
+                                write.write("Highscore: " + HIGHSCORE);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
                         hboxTop.getChildren().add(highscoreCounter);
                         hboxTop.setAlignment(Pos.CENTER);
