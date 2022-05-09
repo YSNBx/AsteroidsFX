@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,14 +42,14 @@ public class App extends Application {
         AudioClip empty = new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/empty.wav")).toExternalForm());
         AudioClip deathSound = new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/death.wav")).toExternalForm());
         AudioClip breakRock = new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/break.wav")).toExternalForm());
-        MediaPlayer music = new MediaPlayer(new Media(Objects.requireNonNull(getClass().getResource("/audio/gamestart.mp3")).toExternalForm()));
+        MediaPlayer backgroundMusic = new MediaPlayer(new Media(Objects.requireNonNull(getClass().getResource("/audio/gamestart.mp3")).toExternalForm()));
 
-        pewPew.setVolume(0.2);
-        empty.setVolume(0.2);
+        pewPew.setVolume(0.15);
+        empty.setVolume(0.15);
         deathSound.setVolume(0.2);
-        breakRock.setVolume(0.2);
-        music.setVolume(0.1);
-        music.setAutoPlay(true);
+        breakRock.setVolume(0.1);
+        backgroundMusic.setVolume(0.25);
+        backgroundMusic.setAutoPlay(true);
 
         BorderPane pane = new BorderPane();
         pane.setPrefSize(WIDTH, HEIGHT);
@@ -115,7 +116,14 @@ public class App extends Application {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                music.play();
+                backgroundMusic.play();
+                backgroundMusic.setOnEndOfMedia(new Runnable() {
+                    @Override
+                    public void run() {
+                        backgroundMusic.seek(Duration.ZERO);
+                        backgroundMusic.play();
+                    }
+                });
                 if (Math.random() < 0.005) {
                     Asteroid asteroid = new Asteroid(WIDTH, HEIGHT);
                     asteroid.getCharacter().setFill(Color.DARKGREY);
@@ -177,7 +185,7 @@ public class App extends Application {
                         stop();
                         pane.getChildren().clear();
                         
-                        music.stop();
+                        backgroundMusic.stop();
                         deathSound.play();
 
                         Button button = new Button("Play Again");
@@ -208,13 +216,7 @@ public class App extends Application {
                         
                         highscoreCounter.setText("Highscore: " + HIGHSCORE);
                         
-                        try (FileWriter write = new FileWriter("highscores")) {
-                            if (HIGHSCORE >= GLOBAL_POINTS_COUNTER) {
-                                write.write("Highscore: " + HIGHSCORE);
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        saveHighscoreToFile();
 
                         hboxTop.getChildren().add(highscoreCounter);
                         hboxTop.setAlignment(Pos.CENTER);
@@ -243,6 +245,16 @@ public class App extends Application {
         stage.setTitle("Asteroids!");
         stage.setScene(scene);
         stage.show();
+    }
+
+    public void saveHighscoreToFile() {
+        try (FileWriter write = new FileWriter("highscores")) {
+            if (HIGHSCORE >= GLOBAL_POINTS_COUNTER) {
+                write.write("Highscore: " + HIGHSCORE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
