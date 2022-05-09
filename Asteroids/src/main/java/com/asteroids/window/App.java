@@ -38,16 +38,11 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        AudioClip pewPew = new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/pew_pew.wav")).toExternalForm());
-        AudioClip empty = new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/empty.wav")).toExternalForm());
-        AudioClip deathSound = new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/death.wav")).toExternalForm());
-        AudioClip breakRock = new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/break.wav")).toExternalForm());
+        
+        //Init Audio Files
+        Map<String, AudioClip> audioFiles = createAudioFilesAndSetVolume();
         MediaPlayer backgroundMusic = new MediaPlayer(new Media(Objects.requireNonNull(getClass().getResource("/audio/gamestart.mp3")).toExternalForm()));
 
-        pewPew.setVolume(0.15);
-        empty.setVolume(0.15);
-        deathSound.setVolume(0.2);
-        breakRock.setVolume(0.1);
         backgroundMusic.setVolume(0.25);
         backgroundMusic.setAutoPlay(true);
 
@@ -91,7 +86,8 @@ public class App extends Application {
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.SPACE && projectiles.size() < 5) {
-                pewPew.play();
+                audioFiles.get("laserCannon").play();
+
                 projectileCounter.setText("Laser Charges Left: " + --CHARGES_COUNTER + "/5");
                 Projectile projectile = new Projectile(
                     (int) ship.getCharacter().getTranslateX(), (int) ship.getCharacter().getTranslateY()
@@ -103,7 +99,7 @@ public class App extends Application {
                 projectile.setMovement(projectile.getMovement().normalize().multiply(3));
                 pane.getChildren().add(projectile.getCharacter());
             } else if (event.getCode() == KeyCode.SPACE) {
-                empty.play();
+                audioFiles.get("emptyClip").play();
             } else {
                 pressedKeys.put(event.getCode(), Boolean.TRUE);
             }
@@ -155,7 +151,7 @@ public class App extends Application {
                 projectiles.forEach(projectile -> {
                     asteroids.forEach(asteroid -> {
                         if (projectile.collide(asteroid)) {
-                            breakRock.play();
+                            audioFiles.get("asteroidHitSound").play();
                             projectile.setAlive(false);
                             asteroid.setAlive(false);
                             GLOBAL_POINTS_COUNTER++;
@@ -185,8 +181,8 @@ public class App extends Application {
                         stop();
                         pane.getChildren().clear();
                         
-                        backgroundMusic.stop();
-                        deathSound.play();
+                        audioFiles.get("backgroundMusic").stop();
+                        audioFiles.get("deathSound").play();
 
                         Button button = new Button("Play Again");
                         button.setStyle(
@@ -227,7 +223,6 @@ public class App extends Application {
                         vbox.getChildren().add(button);
                         vbox.setAlignment(Pos.CENTER);
                         vbox.setPadding(new Insets(0, 0, 20, 0));
-                        
 
                         button.setOnAction(e -> {
                             GLOBAL_POINTS_COUNTER = 0;
@@ -245,6 +240,25 @@ public class App extends Application {
         stage.setTitle("Asteroids!");
         stage.setScene(scene);
         stage.show();
+    }
+
+    public Map<String, AudioClip> createAudioFilesAndSetVolume() {
+        Map<String, AudioClip> tmp = new HashMap<>();
+
+        tmp.put("laserCannon", new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/pew_pew.wav")).toExternalForm()));
+        tmp.put("emptyClip", new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/empty.wav")).toExternalForm()));
+        tmp.put("deathSound", new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/death.wav")).toExternalForm()));
+        tmp.put("asteroidHitSound", new AudioClip(Objects.requireNonNull(getClass().getResource("/audio/break.wav")).toExternalForm()));
+        
+        setVolume(tmp);
+
+        return (HashMap<String, AudioClip>) tmp;
+    }
+
+    public void setVolume(Map<String, AudioClip> tmp) {
+        for (var entry : tmp.entrySet()) {
+            entry.getValue().setVolume(0.15);
+        }
     }
 
     public void saveHighscoreToFile() {
