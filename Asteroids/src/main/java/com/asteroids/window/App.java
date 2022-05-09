@@ -147,8 +147,8 @@ public class App extends Application {
                     ship.accelerate();
                 }
 
-
                 ship.move();
+                
                 asteroids.forEach(Asteroid::move);
                 projectiles.forEach(Projectile::move);
 
