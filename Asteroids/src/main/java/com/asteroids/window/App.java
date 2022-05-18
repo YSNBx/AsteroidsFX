@@ -181,7 +181,7 @@ public class App extends Application {
                         stop();
                         pane.getChildren().clear();
                         
-                        audioFiles.get("backgroundMusic").stop();
+                        backgroundMusic.stop();
                         audioFiles.get("deathSound").play();
 
                         Button button = new Button("Play Again");
