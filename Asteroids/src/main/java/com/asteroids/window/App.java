@@ -35,7 +35,6 @@ public class App extends Application {
     public static int CHARGES_COUNTER = 5;
     public static int HIGHSCORE = 0;
 
-
     @Override
     public void start(Stage stage) {
         

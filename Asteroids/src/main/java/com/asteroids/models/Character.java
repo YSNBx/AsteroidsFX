@@ -13,7 +13,6 @@ public abstract class Character {
         this.character = character;
         this.character.setTranslateX(x);
         this.character.setTranslateY(y);
-
         this.movement = new Point2D(0, 0);
     }
 
