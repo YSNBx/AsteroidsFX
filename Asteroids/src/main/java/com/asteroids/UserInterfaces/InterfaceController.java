@@ -4,7 +4,7 @@ public class InterfaceController {
     private SuperInterface superInterface;
 
     public void execute() {
-        this.superInterface.start();
+        superInterface.start();
     }
 
     public void setInterface(SuperInterface superInterface) {
